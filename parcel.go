@@ -22,11 +22,11 @@ func (s ParcelStore) Add(p Parcel) (int, error) {
 		sql.Named("address", p.Address),
 		sql.Named("created_at", p.CreatedAt))
 	if err != nil {
-		return -1, fmt.Errorf("ParcelStore Add error: %w", err)
+		return 0, fmt.Errorf("db.Exec error: %w", err)
 	}
 	id, err := res.LastInsertId()
 	if err != nil {
-		return -1, fmt.Errorf("ParcelStore Add error: %w", err)
+		return 0, fmt.Errorf("InsertId error: %w", err)
 	}
 	// верните идентификатор последней добавленной записи
 	return int(id), nil
@@ -41,7 +41,7 @@ func (s ParcelStore) Get(number int) (Parcel, error) {
 	if err != nil {
 		return p, fmt.Errorf("ParcelStore Get error: %w", err)
 	}
-	return p, nil
+	return Parcel{}, nil
 }
 
 func (s ParcelStore) GetByClient(client int) ([]Parcel, error) {
@@ -55,6 +55,9 @@ func (s ParcelStore) GetByClient(client int) ([]Parcel, error) {
 	// заполните срез Parcel данными из таблицы
 	var res []Parcel
 	for rows.Next() {
+		if err = rows.Err(); err != nil {
+			return nil, fmt.Errorf("rows error: %w", err)
+		}
 		p := Parcel{}
 		err := rows.Scan(&p.Number, &p.Client, &p.Status, &p.Address, &p.CreatedAt)
 		if err != nil {

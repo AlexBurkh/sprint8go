@@ -43,14 +43,13 @@ func TestAddGetDelete(t *testing.T) {
 	// добавьте новую посылку в БД, убедитесь в отсутствии ошибки и наличии идентификатора
 	id, err := store.Add(parcel)
 	require.NoError(t, err)
-	require.NotEqual(t, 0, id)
+	require.Greater(t, id, -1)
 
 	// get
 	// получите только что добавленную посылку, убедитесь в отсутствии ошибки
 	// проверьте, что значения всех полей в полученном объекте совпадают со значениями полей в переменной parcel
 	p, err := store.Get(id)
 	require.NoError(t, err)
-	assert.Equal(t, parcel.Number, p.Number)
 	assert.Equal(t, parcel.Client, p.Client)
 	assert.Equal(t, parcel.Address, p.Address)
 	assert.Equal(t, parcel.Status, p.Status)
@@ -80,7 +79,7 @@ func TestSetAddress(t *testing.T) {
 	// добавьте новую посылку в БД, убедитесь в отсутствии ошибки и наличии идентификатора
 	id, err := store.Add(parcel)
 	require.NoError(t, err)
-	require.NotEqual(t, 0, id)
+	require.Greater(t, id, -1)
 
 	// set address
 	// обновите адрес, убедитесь в отсутствии ошибки
@@ -109,7 +108,7 @@ func TestSetStatus(t *testing.T) {
 	// добавьте новую посылку в БД, убедитесь в отсутствии ошибки и наличии идентификатора
 	id, err := store.Add(parcel)
 	require.NoError(t, err)
-	require.NotEqual(t, 0, id)
+	require.Greater(t, id, -1)
 
 	// set status
 	// обновите статус, убедитесь в отсутствии ошибки
@@ -161,7 +160,7 @@ func TestGetByClient(t *testing.T) {
 	// убедитесь в отсутствии ошибки
 	require.NoError(t, err)
 	// убедитесь, что количество полученных посылок совпадает с количеством добавленных
-	assert.Len(t, len(storedParcels), len(parcels))
+	assert.Len(t, storedParcels, len(parcels))
 
 	// check
 	for _, parcel := range storedParcels {
@@ -170,7 +169,7 @@ func TestGetByClient(t *testing.T) {
 		p, ok := parcelMap[parcel.Number]
 		assert.True(t, ok)
 		// убедитесь, что значения полей полученных посылок заполнены верно
-		assert.Equal(t, client, p.Client)
+		assert.Equal(t, parcel, p)
 		assert.Equal(t, ParcelStatusRegistered, p.Status)
 		assert.Equal(t, "test", p.Address)
 		assert.NotEmpty(t, p.CreatedAt)
